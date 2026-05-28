@@ -10,7 +10,7 @@ public class Appointment {
     private ServiceType serviceType;
     private LocalDateTime appointmentStart;
     private LocalDateTime appointmentEnd;
-    private String status;
+    private AppointmentStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime cancelledAt;
 
@@ -19,7 +19,7 @@ public class Appointment {
 
     public Appointment(Long id, Client client, Doctor doctor, ServiceType serviceType,
                        LocalDateTime appointmentStart, LocalDateTime appointmentEnd,
-                       String status, LocalDateTime createdAt, LocalDateTime cancelledAt) {
+                       AppointmentStatus status, LocalDateTime createdAt, LocalDateTime cancelledAt) {
         this.id = id;
         this.client = client;
         this.doctor = doctor;
@@ -79,12 +79,12 @@ public class Appointment {
         this.appointmentEnd = appointmentEnd;
     }
 
-    public String getStatus() {
-        return status;
+    public AppointmentStatus getStatus() {
+    return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatus(AppointmentStatus status) {
+    this.status = status;
     }
 
     public LocalDateTime getCreatedAt() {

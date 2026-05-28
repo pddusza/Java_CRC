@@ -61,7 +61,7 @@ class DomainModelTests {
     }
 
     @Test
-    void shouldCreateAppointmentWithClientDoctorAndService() {
+        void shouldCreateAppointmentWithClientDoctorAndService() {
         LocalDateTime createdAt = LocalDateTime.of(2026, 4, 18, 9, 0);
         LocalDateTime start = LocalDateTime.of(2026, 4, 20, 12, 0);
         LocalDateTime end = LocalDateTime.of(2026, 4, 20, 12, 30);
@@ -100,7 +100,7 @@ class DomainModelTests {
                 serviceType,
                 start,
                 end,
-                "PLANNED",
+                AppointmentStatus.PLANNED,
                 createdAt,
                 null
         );
@@ -108,7 +108,7 @@ class DomainModelTests {
         assertSame(client, appointment.getClient());
         assertSame(doctor, appointment.getDoctor());
         assertSame(serviceType, appointment.getServiceType());
-        assertEquals("PLANNED", appointment.getStatus());
+        assertEquals(AppointmentStatus.PLANNED, appointment.getStatus());
         assertEquals(start, appointment.getAppointmentStart());
         assertEquals(end, appointment.getAppointmentEnd());
     }
