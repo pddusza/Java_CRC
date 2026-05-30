@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @SpringBootTest
 class AppointmentServiceTest {
@@ -89,6 +90,71 @@ class AppointmentServiceTest {
                 start.plusMinutes(15)
         ));
     }
+
+    @Test
+    void shouldAllowSameTimeAppointmentForDifferentDoctor() {
+        Client firstClient = saveClient("different.first.client@example.com");
+        Client secondClient = saveClient("different.second.client@example.com");
+        Doctor firstDoctor = saveDoctor("different.first.doctor@example.com");
+        Doctor secondDoctor = saveDoctor("different.second.doctor@example.com");
+        ServiceType serviceType = saveServiceType("Different doctor consultation", 30);
+        LocalDateTime start = LocalDateTime.of(2026, 6, 2, 14, 0);
+
+        appointmentService.createAppointment(firstClient.getId(), firstDoctor.getId(), serviceType.getId(), start);
+
+        AppointmentRecord secondAppointment = assertDoesNotThrow(() -> appointmentService.createAppointment(
+                secondClient.getId(),
+                secondDoctor.getId(),
+                serviceType.getId(),
+                start
+        ));
+
+        assertEquals(secondDoctor.getId(), secondAppointment.getDoctorId());
+        assertEquals(start, secondAppointment.getAppointmentStart());
+    }
+
+    @Test
+    void shouldAllowAppointmentStartingWhenPreviousOneEnds() {
+        Client firstClient = saveClient("edge.first.client@example.com");
+        Client secondClient = saveClient("edge.second.client@example.com");
+        Doctor doctor = saveDoctor("edge.doctor@example.com");
+        ServiceType serviceType = saveServiceType("Edge consultation A", 30);
+        LocalDateTime start = LocalDateTime.of(2026, 6, 2, 11, 0);
+
+        appointmentService.createAppointment(firstClient.getId(), doctor.getId(), serviceType.getId(), start);
+
+        AppointmentRecord nextAppointment = assertDoesNotThrow(() -> appointmentService.createAppointment(
+                secondClient.getId(),
+                doctor.getId(),
+                serviceType.getId(),
+                start.plusMinutes(30)
+        ));
+
+        assertEquals(start.plusMinutes(30), nextAppointment.getAppointmentStart());
+        assertEquals(start.plusMinutes(60), nextAppointment.getAppointmentEnd());
+    }
+
+    @Test
+    void shouldAllowAppointmentEndingWhenNextOneStarts() {
+        Client firstClient = saveClient("edge.third.client@example.com");
+        Client secondClient = saveClient("edge.fourth.client@example.com");
+        Doctor doctor = saveDoctor("edge.second.doctor@example.com");
+        ServiceType serviceType = saveServiceType("Edge consultation B", 30);
+        LocalDateTime laterStart = LocalDateTime.of(2026, 6, 2, 12, 30);
+
+        appointmentService.createAppointment(firstClient.getId(), doctor.getId(), serviceType.getId(), laterStart);
+
+        AppointmentRecord previousAppointment = assertDoesNotThrow(() -> appointmentService.createAppointment(
+                secondClient.getId(),
+                doctor.getId(),
+                serviceType.getId(),
+                laterStart.minusMinutes(30)
+        ));
+
+        assertEquals(laterStart.minusMinutes(30), previousAppointment.getAppointmentStart());
+        assertEquals(laterStart, previousAppointment.getAppointmentEnd());
+    }
+
 
     private Client saveClient(String email) {
         return clientRepository.save(new Client(
