@@ -26,6 +26,7 @@ class ClientRepositoryTest {
 
     @BeforeEach
     void cleanDatabase() {
+        jdbcTemplate.update("DELETE FROM appointments");
         jdbcTemplate.update("DELETE FROM clients");
     }
 

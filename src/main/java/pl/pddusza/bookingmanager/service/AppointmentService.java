@@ -11,6 +11,9 @@ import pl.pddusza.bookingmanager.repository.DoctorRepository;
 import pl.pddusza.bookingmanager.repository.ServiceTypeRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 
 @Service
 public class AppointmentService {
@@ -57,4 +60,13 @@ public class AppointmentService {
                 AppointmentStatus.PLANNED
         );
     }
+
+
+        public Optional<AppointmentRecord> findAppointmentById(Long id) {
+                return appointmentRepository.findById(id);
+        }
+
+        public List<AppointmentRecord> findAppointmentsByDoctorId(Long doctorId) {
+                return appointmentRepository.findByDoctorId(doctorId);
+        }
 }
